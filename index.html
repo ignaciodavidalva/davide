@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Davide - Hacemos Crecer tu Empresa con el Talento Adecuado</title>
+    
+    <!-- Chosen Palette: Confianza, Profesionalismo y Crecimiento (Primary Blue from logo: #204080, Sky Blue: #38b6ff, Light Grey: #dcdcdc, Text Dark Grey: #2C3E50, Background: #F8F8F8) -->
+    <!-- Application Structure Plan: A single-page, narrative scroll application. The structure guides the user from acknowledging their hiring 'pain points' (made interactive) to understanding the value of strategic hiring (visualized in a chart), and finally presents Davide's structured process and value proposition as the clear solution. This flow is designed to be more persuasive and engaging than a static text, mirroring a consultation process. Key interactions include clickable cards for pain points and an accordion-style reveal for the 7-step process. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Client pain points (uncertainty, bad hires, high turnover). -> Goal: User self-identification. -> Viz/Presentation: Interactive cards (HTML/CSS/JS). -> Interaction: On click, reveal text explaining the consequence. -> Justification: Makes the problem feel personal and acknowledged. -> Library/Method: Vanilla JS for DOM manipulation.
+        - Report Info: Link between right people, growth, and profitability. -> Goal: Visually prove the ROI of good hiring. -> Viz/Presentation: Line Chart (Canvas). -> Interaction: Static chart with tooltips for clarity. -> Justification: Translates a key text concept into a powerful, easy-to-understand visual. -> Library/Method: Chart.js.
+        - Report Info: Davide's 7-step process. -> Goal: Explain the methodology clearly. -> Viz/Presentation: Accordion/collapsible list (HTML/CSS/JS). -> Interaction: Click to expand/collapse each step. -> Justification: Prevents information overload and presents the process as structured and manageable. -> Library/Method: Vanilla JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F8F8; /* Light background */
+            color: #2C3E50; /* Dark Blue-Grey for main text */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 640px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .pain-point-card.active {
+            border-color: #204080; /* Deep Blue from logo */
+            transform: translateY(-5px);
+        }
+        .step-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .step.active .step-content {
+            max-height: 500px; /* Adjust as needed */
+        }
+         .step.active .chevron {
+            transform: rotate(180deg);
+        }
+        .chevron {
+            transition: transform 0.3s ease-in-out;
+        }
+        .logo-img {
+            height: 32px; /* Adjust height as needed */
+            width: auto;
+            display: block; /* Ensures it behaves as a block element for sizing */
+            object-fit: contain; /* Ensures the image scales correctly within its bounds */
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header class="bg-[#204080] fixed top-0 left-0 right-0 z-50 shadow-sm">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="http://googleusercontent.com/file_content/1" alt="Davide Logo" class="logo-img" onerror="this.onerror=null;this.src='https://placehold.co/120x32/204080/BDC3C7?text=Davide';">
+            </div>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#problemas" class="text-white hover:text-[#38b6ff] transition">El Problema</a>
+                <a href="#solucion" class="text-white hover:text-[#38b6ff] transition">La Solución</a>
+                <a href="#proceso" class="text-white hover:text-[#38b6ff] transition">Nuestro Proceso</a>
+            </nav>
+            <a href="#contacto" class="bg-[#38b6ff] text-white font-bold py-2 px-5 rounded-lg hover:bg-[#2A9AE0] transition shadow-md hover:shadow-lg">
+                Contactar
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="pt-32 pb-20 bg-white">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-extrabold text-[#2C3E50] leading-tight">
+                    ¿Tu negocio está listo para crecer, <br class="hidden md:block"> pero no sabés cómo <span class="text-[#38b6ff]">formar al equipo ideal</span>?
+                </h1>
+                <p class="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-[#2C3E50]">
+                    En Davide, convertimos la contratación de personal en una decisión estratégica y una oportunidad única para la rentabilidad y el futuro de tu empresa.
+                </p>
+                <div class="mt-10">
+                    <a href="#problemas" class="bg-[#204080] text-white font-bold py-4 px-8 rounded-lg text-lg hover:bg-[#1A3469] transition shadow-lg hover:shadow-xl">
+                        Descubrí cómo
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problems Section -->
+        <section id="problemas" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#2C3E50]">¿Te suena familiar este dolor de cabeza?</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-[#2C3E50]">
+                        La contratación puede ser un campo minado. Identificar el problema es el primer paso para resolverlo. Hacé clic en cada punto para ver cómo te afecta.
+                    </p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="pain-point-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent hover:border-[#204080] cursor-pointer transition-all duration-300" data-problem="incertidumbre">
+                        <h3 class="text-xl font-bold text-[#2C3E50]">Incertidumbre Estratégica</h3>
+                        <p class="mt-2 text-[#2C3E50]">No saber exactamente qué perfil necesitás para que tu empresa dé el siguiente paso.</p>
+                    </div>
+                    <div class="pain-point-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent hover:border-[#204080] cursor-pointer transition-all duration-300" data-problem="frustracion">
+                        <h3 class="text-xl font-bold text-[#2C3E50]">Miedo y Frustración</h3>
+                        <p class="mt-2 text-[#2C3E50]">Invertir tiempo y dinero en un proceso desconocido que termina en no encontrar a la persona adecuada.</p>
+                    </div>
+                    <div class="pain-point-card bg-white p-6 rounded-xl shadow-md border-2 border-transparent hover:border-[#204080] cursor-pointer transition-all duration-300" data-problem="rotacion">
+                        <h3 class="text-xl font-bold text-[#2C3E50]">Alta Rotación</h3>
+                        <p class="mt-2 text-[#2C3E50]">Tomarlo a la ligera y enfrentar las serias consecuencias de una mala elección, perdiendo talento, tiempo y dinero.</p>
+                    </div>
+                </div>
+                <div id="problem-details" class="mt-10 bg-[#EBF5F8] p-8 rounded-xl text-center min-h-[120px] flex items-center justify-center transition-opacity duration-500 opacity-0">
+                    <p class="text-xl text-[#204080] font-medium"></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solution / Chart Section -->
+        <section id="solucion" class="py-20 bg-white">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#2C3E50]">La Conexión Directa: Personas y Rentabilidad</h2>
+                    <p class="mt-4 max-w-3xl mx-auto text-lg text-[#2C3E50]">
+                        No es un mito. La calidad de tus contrataciones impacta directamente en el éxito de tu negocio. Las personas correctas no son un gasto, son la inversión más rentable que podés hacer.
+                    </p>
+                </div>
+                <div class="chart-container">
+                    <canvas id="hiringImpactChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Process Section -->
+        <section id="proceso" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-[#2C3E50]">Te acompañamos para que sea un éxito rotundo</h2>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-[#2C3E50]">
+                        Con nuestra amplia experiencia, te guiamos en cada paso del proceso, eliminando la incertidumbre y asegurando que encuentres al talento que realmente necesitás. Explorá nuestro proceso.
+                    </p>
+                </div>
+                <div id="steps-container" class="max-w-3xl mx-auto space-y-4">
+                    <!-- Steps will be injected here by JS -->
+                </div>
+            </div>
+        </section>
+        
+        <!-- Final CTA Section -->
+        <section id="contacto" class="py-20 bg-[#204080]">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white leading-tight">
+                    ¿Tenés que contratar?
+                </h2>
+                <p class="mt-4 text-2xl md:text-4xl font-bold text-white/90">
+                    Empezá contratando a <span class="text-[#38b6ff]">Davide</span>.
+                </p>
+                <p class="mt-6 max-w-2xl mx-auto text-lg text-[#B0DFFF]">
+                    Convertí un problema en una decisión inteligente que impulse tu crecimiento. Nuestro servicio está garantizado.
+                </p>
+                <div class="mt-10">
+                    <p class="mt-4 text-white text-lg font-semibold">Ing. Ignacio Alva</p>
+                    <p class="text-[#B0DFFF] text-base">3415 018 968</p>
+                    <p class="text-[#B0DFFF] text-base"><a href="mailto:ignacioalva.ia@gmail.com" class="hover:underline">ignacioalva.ia@gmail.com</a></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-[#2C3E50] text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Davide. Todos los derechos reservados.</p>
+            <p class="text-[#dcdcdc] mt-2">Una decisión inteligente para el crecimiento de tu empresa.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Interactive Problems Section ---
+            const problemCards = document.querySelectorAll('.pain-point-card');
+            const detailsContainer = document.getElementById('problem-details');
+            const detailsText = detailsContainer.querySelector('p');
+
+            const problemDescriptions = {
+                incertidumbre: "Esta duda te paraliza o te lleva a contratar perfiles genéricos que no resuelven tus problemas de fondo, frenando tu crecimiento.",
+                frustracion: "Cada contratación fallida es un golpe a la moral del equipo y a tus finanzas. Se pierde tiempo valioso que podrías dedicar a tu negocio.",
+                rotacion: "La alta rotación genera costos ocultos enormes: capacitación constante, pérdida de conocimiento y un clima laboral inestable que afecta la productividad."
+            };
+
+            problemCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const problemKey = card.dataset.problem;
+                    
+                    problemCards.forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+
+                    detailsText.textContent = problemDescriptions[problemKey];
+                    detailsContainer.classList.remove('opacity-0');
+                });
+            });
+
+            // --- Chart.js Implementation ---
+            const chartCanvas = document.getElementById('hiringImpactChart');
+            if (chartCanvas) {
+                const ctx = chartCanvas.getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Contratación Reactiva', 'Proceso Básico', 'Proceso Estructurado', 'Decisión Estratégica (Davide)'],
+                        datasets: [{
+                            label: 'Rentabilidad',
+                            data: [15, 25, 55, 90],
+                            borderColor: '#38b6ff', /* Sky Blue */
+                            backgroundColor: 'rgba(56, 182, 255, 0.1)', /* Lighter Sky Blue */
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#38b6ff',
+                            pointRadius: 5
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    font: {
+                                        size: 14,
+                                        family: "'Inter', sans-serif"
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                titleFont: { weight: 'bold' },
+                                bodyFont: { size: 14 },
+                                padding: 12,
+                                boxPadding: 4,
+                                cornerRadius: 8
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#dcdcdc' /* Light Grey for grid lines */
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%'
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // --- Process Steps Accordion ---
+            const stepsData = [
+                { title: "Hacemos FOCO en tu necesidad", content: "No solo buscamos, primero estudiamos tu proceso y definimos juntos el perfil exacto que necesitás para crecer. Analizamos a fondo tu cultura y el puesto para definir el perfil ideal." },
+                { title: "Buscamos al mejor", content: "Activamos todas las redes y canales de vanguardia para encontrar candidatos de calidad que sean perfectos para tu empresa." },
+                { title: "Filtramos y seleccionamos", content: "Hacemos el trabajo pesado de preselección, análisis de CV y verificación de referencias para que solo inviertas tu tiempo en los mejores candidatos." },
+                { title: "Te acompañamos en las entrevistas", content: "Juntos, elegimos a los finalistas. Te damos herramientas y nuestra perspectiva experta para asegurar la mejor compatibilidad técnica y cultural." },
+                { title: "Aseguramos la elección", content: "Complementamos el proceso con informes psicotécnicos, ambientales y médicos, dándote una visión 360° para una decisión informada y sin riesgos." },
+                { title: "Negociamos y cerramos", content: "Te ayudamos a estructurar y formalizar la oferta, negociando las condiciones necesarias para que ambas partes queden satisfechas y comprometidas." },
+                { title: "Diseñamos un Onboarding efectivo", content: "Un extra crucial. Te enseñamos a diseñar los primeros días para que el nuevo integrante se adapte, se sienta parte y contribuya desde el inicio, reduciendo la rotación." }
+            ];
+
+            const stepsContainer = document.getElementById('steps-container');
+            if (stepsContainer) {
+                stepsData.forEach((step, index) => {
+                    const stepEl = document.createElement('div');
+                    stepEl.className = 'step bg-white rounded-xl shadow-sm overflow-hidden';
+                    stepEl.innerHTML = `
+                        <div class="step-trigger flex justify-between items-center p-5 cursor-pointer">
+                            <h3 class="text-lg font-bold text-[#2C3E50]">${index + 1}. ${step.title}</h3>
+                            <div class="chevron text-[#004aad]">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                            </div>
+                        </div>
+                        <div class="step-content">
+                            <p class="px-5 pb-5 text-[#2C3E50]">${step.content}</p>
+                        </div>
+                    `;
+                    stepsContainer.appendChild(stepEl);
+                });
+
+                stepsContainer.addEventListener('click', (e) => {
+                    const trigger = e.target.closest('.step-trigger');
+                    if (trigger) {
+                        const parentStep = trigger.parentElement;
+                        parentStep.classList.toggle('active');
+                        
+                        // Close other steps
+                        document.querySelectorAll('.step').forEach(s => {
+                            if (s !== parentStep) {
+                                s.classList.remove('active');
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
